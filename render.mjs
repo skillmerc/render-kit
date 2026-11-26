@@ -59,7 +59,7 @@ body{font-family:'Geist',sans-serif;color:${c.fg};-webkit-font-smoothing:antiali
 .body{font-size:${Math.round((portrait ? 46 : 48) * u)}px;line-height:1.35;color:${sc.image ? c.fg : c.muted};max-width:${Math.round((portrait ? 880 : 1300) * u)}px}
 .ring{position:absolute;border-radius:50%;border:${Math.round(3 * u)}px solid ${c.accent};opacity:.28}
 .glow{position:absolute;border-radius:50%;background:radial-gradient(circle,${c.accent}33,transparent 65%)}
-.shade{position:absolute;inset:0;background:linear-gradient(${portrait ? '0deg' : '90deg'},rgba(0,0,0,.78) 0%,rgba(0,0,0,.55) 45%,rgba(0,0,0,.15) 100%)}
+.shade{position:absolute;inset:0;background:linear-gradient(${portrait ? '0deg' : '90deg'},rgba(0,0,0,.9) 0%,rgba(0,0,0,.78) 50%,rgba(0,0,0,.35) 100%)}
 .cap{position:absolute;left:50%;bottom:${Math.round((portrait ? 300 : 70) * u)}px;transform:translateX(-50%);max-width:${Math.round(W * 0.8)}px;padding:${Math.round(14 * u)}px ${Math.round(26 * u)}px;border-radius:${Math.round(14 * u)}px;background:rgba(0,0,0,.66);color:#fff;font-size:${Math.round(36 * u)}px;line-height:1.3;text-align:center;font-weight:500}
 </style></head><body>${mode === 'bg' ? `<div class="glow" style="width:${1400 * u}px;height:${1400 * u}px;right:${-500 * u}px;top:${-600 * u}px"></div><div class="ring" style="width:${700 * u}px;height:${700 * u}px;right:${-260 * u}px;bottom:${-300 * u}px"></div>` : ''}
 ${mode === 'shade' ? '<div class="shade"></div>' : ''}
@@ -93,7 +93,7 @@ for (let i = 0; i < scenes.length; i++) {
     if (!r.ok) fail(`scene ${i + 1}: image download failed (${r.status})`);
     bgFile = `${dir}/image`;
     writeFileSync(bgFile, Buffer.from(await r.arrayBuffer()));
-    await shot(html(sc, 'shade'), `${dir}/shade.png`);
+    if (itemCount(sc)) await shot(html(sc, 'shade'), `${dir}/shade.png`);
   } else {
     await shot(html(sc, 'bg'), bgFile);
   }
@@ -103,14 +103,15 @@ for (let i = 0; i < scenes.length; i++) {
 
   const args = ['-y', '-loglevel', 'error', '-i', bgFile];
   const pre = [];
-  if (sc.image) pre.push(`${dir}/shade.png`);
+  const shaded = sc.image && itemCount(sc) > 0;
+  if (shaded) pre.push(`${dir}/shade.png`);
   for (const f of [...pre, ...layers.map((l) => l.file)]) args.push('-loop', '1', '-framerate', String(FPS), '-t', String(D), '-i', f);
   // Ken Burns: upscale, then zoom in (or out on odd scenes) slowly across the scene.
   const zin = sc.kenBurns === 'out' || (sc.kenBurns !== 'in' && i % 2 === 1);
   const z = zin ? `1.12-0.12*on/${N}` : `1+0.12*on/${N}`;
   const f = [`[0:v]scale=${W * 2}:${H * 2}:force_original_aspect_ratio=increase,crop=${W * 2}:${H * 2},zoompan=z='${z}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${N}:s=${W}x${H}:fps=${FPS},setsar=1,format=rgba[b0]`];
   let last = 'b0', n = 1;
-  if (sc.image) { f.push(`[${last}][1:v]overlay=0:0[b1]`); last = 'b1'; n = 2; }
+  if (shaded) { f.push(`[${last}][1:v]overlay=0:0[b1]`); last = 'b1'; n = 2; }
   layers.forEach((l, k) => {
     const inp = n + k;
     f.push(`[${inp}:v]format=rgba,fade=t=in:st=${l.start.toFixed(2)}:d=0.5:alpha=1[l${k}]`);

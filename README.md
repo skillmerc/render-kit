@@ -39,7 +39,7 @@ Text goes in the dispatch input only. Nothing from a spec is committed to this r
 | `scenes[].lines` | Up to 6 lines. The first is the headline, the rest are body text |
 | `scenes[].kicker` | Small label above the headline |
 | `scenes[].duration` | 1.5 to 30 seconds. Total length up to 180 seconds |
-| `scenes[].image` | An https image to use as the background, with a slow zoom and a dark shade for legible text. Use only images you have the rights to |
+| `scenes[].image` | An https image to use as the background, with a slow zoom. With lines, a dark shade keeps the text legible; with no lines (a product screenshot) it shows unshaded. Use only images you have the rights to |
 | `scenes[].caption` | Caption text in a bar near the bottom |
 | `scenes[].transition` | How this scene comes in: `fade`, `dissolve`, `slideleft`, `slideright`, `slideup`, `slidedown`, `wipeleft`, `wiperight`, `wipeup`, `wipedown`, `smoothleft`, `smoothright`, `smoothup`, `smoothdown`, `circleopen`, `circleclose` |
 | `scenes[].kenBurns` | `in` or `out` (default alternates) |

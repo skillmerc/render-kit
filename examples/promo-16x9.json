@@ -1,0 +1,12 @@
+{
+  "aspect": "16:9",
+  "music": "none",
+  "palette": { "bg": "#0d0d10", "fg": "#f4f4f5", "muted": "#a1a1aa", "accent": "#ff6a48" },
+  "scenes": [
+    { "kicker": "List & Table Scraper", "lines": ["Stop copying web tables by hand."], "duration": 4.5, "caption": "A Chrome extension for tables and lists" },
+    { "lines": ["Select any table or list.", "Rows and columns are found for you."], "duration": 4.5, "transition": "slideleft", "caption": "Click the table you want" },
+    { "lines": ["Export to CSV or Excel."], "image": "https://raw.githubusercontent.com/skillmerc/render-kit/main/examples/hero-desktop.png", "duration": 4.5, "transition": "smoothleft", "caption": "One click from page to file" },
+    { "lines": ["Open it in Sheets, Excel or Numbers."], "duration": 4.5, "transition": "slideup" },
+    { "kicker": "Made by SKILLMERC", "lines": ["List & Table Scraper", "Free plan in the Chrome Web Store."], "duration": 4.4, "transition": "fade", "align": "center" }
+  ]
+}

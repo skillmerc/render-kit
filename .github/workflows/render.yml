@@ -1,0 +1,47 @@
+name: render
+on:
+  workflow_dispatch:
+    inputs:
+      spec:
+        description: "JSON spec (see README)"
+        required: true
+      name:
+        description: "Output file name, letters, digits, - and _"
+        required: false
+        default: "render"
+concurrency:
+  group: render-${{ inputs.name }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tools
+        run: |
+          which ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
+          ffmpeg -version | head -1
+          npm install --no-save --no-audit --no-fund puppeteer-core@23
+      - name: Render
+        env:
+          SPEC: ${{ inputs.spec }}
+          NAME: ${{ inputs.name }}
+        run: node render.mjs
+      - name: Probe
+        run: |
+          for f in out/*.mp4; do
+            echo "file: $f"
+            ffprobe -v error -show_entries format=duration,size,bit_rate:stream=codec_name,width,height,r_frame_rate -of default=noprint_wrappers=1 "$f"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.name }}
+          path: out/*.mp4
+          retention-days: 1
+          if-no-files-found: error
